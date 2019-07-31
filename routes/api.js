@@ -126,6 +126,8 @@ module.exports = function (app, db) {
       // //US 8: If I try to request a book that doesn't exist I will get a 'no book exists' message.
     })
     
+    // I can delete /api/books/{_id} to delete a book from the collection.
+    // Returned will be 'delete successful' if successful.
     .delete(function(req, res){
       var bookid = req.params.id;
       //if successful response will be 'delete successful'

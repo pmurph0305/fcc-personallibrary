@@ -107,7 +107,7 @@ suite('Functional Tests', function() {
         })
       });
       
-      // I can get /api/books/{_id} to retrieve a single object 
+      // US: 5 I can get /api/books/{_id} to retrieve a single object 
       // of a book containing title, _id, & an array of comments 
       // (empty array if no comments present).
       test('Test GET /api/books/[id] with valid id in db',  function(done){
@@ -122,7 +122,7 @@ suite('Functional Tests', function() {
       });
     });
 
-    // I can post a comment to /api/books/{_id} to add a comment to a book and returned will be the books object similar to get /api/books/{_id}.
+    //US 6: I can post a comment to /api/books/{_id} to add a comment to a book and returned will be the books object similar to get /api/books/{_id}.
     suite('POST /api/books/[id] => add comment/expect book object with id', function(){
       test('Test POST /api/books/[id] with comment', function(done){
         let testComment = "CommentTest"
@@ -139,11 +139,31 @@ suite('Functional Tests', function() {
           assert.include(res.body.comments, testComment, "Comments array should incldue " + testComment);
           done();
         })
-        //done();
       });
-      
     });
 
-  });
+    // US 7: I can delete /api/books/{_id} to delete a book from the collection. Returned will be 'delete successful' if successful.
+    // self expanded to response of delete unsuccessful if delete is not successful.
+    suite("DELETE /api/books/{_id} => delete a book with 'delete successful' if successful", function() {
+      test("Test DELETE /api/books/[id] with valid id", function(done) {
+        chai.request(server)
+        .delete("/api/books/"+id)
+        .end(function(err, res) {
+          assert.equal(res.status, 200);
+          assert.equal(res.body.message, "delete successful");
+          done();
+        })
+      })
 
+      test("Test DELETE /api/books/[id] with id not in database", function(done) {
+        let fakeId = "507f1f77bcf86cd799439011"
+        chai.request(server)
+        .delete("/api/books/"+fakeId)
+        .end(function(err, res) {
+          assert.equal(res.status, 200);
+          assert.equal(res.body.message, "delete unsuccessful");
+        })
+      })
+    });
+  });
 });
