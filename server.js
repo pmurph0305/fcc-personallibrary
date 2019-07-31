@@ -20,7 +20,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 //US 1: Nothing from my website will be cached in my client as a security measure.
 app.use(helmet.noCache());
-
+//US 2: I will see that the site is powered by 'PHP 4.2.0' even though it isn't as a security measure.
+app.use(helmet.hidePoweredBy({ setTo: "PHP 4.2.0" }));
 MongoClient.connect(process.env.DB, { useNewUrlParser: true }, (err, client) => {
   if (err) console.log("DB Error: "+ err);
   else {
