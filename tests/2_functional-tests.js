@@ -160,8 +160,10 @@ suite('Functional Tests', function() {
         chai.request(server)
         .delete("/api/books/"+fakeId)
         .end(function(err, res) {
+          //console.log(res.body);
           assert.equal(res.status, 200);
           assert.equal(res.body.message, "delete unsuccessful");
+          done();
         })
       })
     });

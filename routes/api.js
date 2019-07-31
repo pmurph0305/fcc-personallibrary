@@ -114,22 +114,38 @@ module.exports = function (app, db) {
           function(err, result) {
             if (err) res.json({ message: "Database error."})
             else {
-              res.json({
-                _id: result.value._id,
-                title: result.value.title,
-                comments: result.value.comments,
-              });
+              if (result.value) {
+                res.json({
+                  _id: result.value._id,
+                  title: result.value.title,
+                  comments: result.value.comments,
+                });
+              } else {
+                //US 8: If I try to request a book that doesn't exist I will get a 'no book exists' message.
+                res.json({ message: "no book exists" });
+              }
             }
           }
         )
       }
-      // //US 8: If I try to request a book that doesn't exist I will get a 'no book exists' message.
     })
     
-    // I can delete /api/books/{_id} to delete a book from the collection.
+    //US 7: I can delete /api/books/{_id} to delete a book from the collection.
     // Returned will be 'delete successful' if successful.
     .delete(function(req, res){
       var bookid = req.params.id;
-      //if successful response will be 'delete successful'
+      if (!ObjectId.isValid(bookid)) {
+        res.json({ message: "Invalid book id."});
+      } else {
+        db.collection('books').deleteOne({_id: ObjectId(bookid)}, function(err, result) {
+          if (err) res.json({ message: "Database error." });
+           //if successful response will be 'delete successful'
+          else if (result.deletedCount === 1) {
+            res.json({ message: "delete successful" });
+          } else {
+            res.json({ message: "delete unsuccessful" });
+          }
+        })
+      }
     });
 }
