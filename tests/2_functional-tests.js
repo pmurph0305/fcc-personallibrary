@@ -37,9 +37,8 @@ suite('Functional Tests', function() {
 
   suite('Routing tests', function() {
 
-
     suite('POST /api/books with title => create book object/expect book object', function() {
-      
+      //US 3: I can post a title to /api/books to add a book and returned will be the object with the title and a unique _id.
       test('Test POST /api/books with title', function(done) {
         let title = "testbook";
         chai.request(server)
@@ -55,6 +54,8 @@ suite('Functional Tests', function() {
         })
       });
       
+      // User stories does not say how to handle no title given
+      // currently it returns a message saying a title is required.
       test('Test POST /api/books with no title given', function(done) {
         let title = "";
         chai.request(server)
@@ -70,17 +71,23 @@ suite('Functional Tests', function() {
           done();
         })
       });
-      
+
     });
 
 
-    // suite('GET /api/books => array of books', function(){
-      
-    //   test('Test GET /api/books',  function(done){
-    //     //done();
-    //   });      
-      
-    // });
+    suite('GET /api/books => array of books', function(){
+      //US 4: I can get /api/books to retrieve an aray of all books containing title, _id, & commentcount.
+      test('Test GET /api/books',  function(done){
+        chai.request(server)
+        .get('/api/books')
+        .end(function(err, res) {
+          assert.equal(res.status, 200);
+          assert.typeOf(res.body, "Array", "Response should be an Array");
+          assert.hasAllKeys(res.body[0], ['_id', 'title', 'commentcount'], "Every object should have title, _id, and commentcount");
+          done();
+        })
+      });      
+    });
 
 
     // suite('GET /api/books/[id] => book object with [id]', function(){
