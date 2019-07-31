@@ -166,7 +166,7 @@ suite('Functional Tests', function() {
       });
     });
 
-    // If I try to request a book that doesn't exist I will get a 'no book exists' message.
+    //US 8: If I try to request a book that doesn't exist I will get a 'no book exists' message.
     suite("Extra tests for routes to test US 8", function() {
       test("test POST /api/books/[id] with comment to id that does not exist", function(done) {
         let fakeId = "507f1f77bcf86cd799439011";
@@ -176,6 +176,35 @@ suite('Functional Tests', function() {
         .end(function(err, res) {
           assert.equal(res.status, 200);
           assert.equal(res.body.message, "no book exists");
+          done();
+        });
+      });
+    });
+
+    suite("Test DELETE /api/books", function() {
+      //US 9: I can send a delete request to /api/books to delete all books in the database. Returned will be 'complete delete successful' if successful.
+      test("Test DELETE /api/books while there are books in the database", function(done) {
+        chai.request(server)
+        .post("/api/books")
+        .send({ title: "delete this book" })
+        .end(function(error, response) {
+          chai.request(server)
+          .delete("/api/books")
+          .end(function(err, res) {
+            assert.equal(res.status, 200);
+            assert.equal(res.body.message, "complete delete successful")
+            done();
+          });
+        })
+      });
+
+      //US 9 Extended: Send delete request to api/books to delete all books, will respond with complete delete unsuccesful if not successful.
+      test("Test DELETE /api/books while there are no books in the database", function(done) {
+        chai.request(server)
+        .delete("/api/books")
+        .end(function(err, res) {
+          assert.equal(res.status, 200);
+          assert.equal(res.body.message, "complete delete unsuccessful");
           done();
         });
       });

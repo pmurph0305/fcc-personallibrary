@@ -30,14 +30,14 @@ module.exports = function (app, db) {
     .post(function (req, res){
       var title = req.body.title;
       if (!title) {
-        res.json({ message: "A book title must be provided."})
+        res.json({ message: "A book title must be provided."});
       } else {
         // add comment counts here, so every book contains a comment count.
         db.collection('books').insertOne({
           title: title,
           commentcount: 0
         }, function(err, result) {
-          if (err) res.json({ message: "Database Error, unable to add a new book." })
+          if (err) res.json({ message: "Database Error." });
           else {
             //response will contain new book object including at least _id and title
             //US 3 says just title, and unique id, so that is what is returned.
@@ -46,12 +46,23 @@ module.exports = function (app, db) {
               title: result.ops[0].title 
             });
           }
-        })
+        });
       }
     })
     
+    //US 9: I can send a delete request to /api/books to delete all books in the database. Returned will be 'complete delete successful' if successful.
     .delete(function(req, res){
       //if successful response will be 'complete delete successful'
+      db.collection('books').deleteMany({}, function(err, result) {
+        if (err) res.json({ message: "Database Error."});
+        else {
+          if (result.deletedCount > 0) {
+            res.json({ message: "complete delete successful" });
+          } else {
+            res.json({ message: "complete delete unsuccessful" });
+          }
+        }
+      });
     });
 
 
@@ -62,14 +73,14 @@ module.exports = function (app, db) {
     .get(function (req, res){
       var bookid = req.params.id;
       if (!bookid) {
-        res.json({ message: "Must submit a bookid"})
+        res.json({ message: "Must submit a bookid"});
       } else {
         // make sure book id is a valid ObjectId
         if (!ObjectId.isValid(bookid)) {
           res.json({ message: "Invalid book id." });
         } else {
           db.collection("books").findOne({ _id: ObjectId(bookid) }, function(err, result) {
-            if (err) res.json({ message: "Database error."})
+            if (err) res.json({ message: "Database error."});
             // non empty result.
             else if (result) {
               if (!result.hasOwnProperty("comments")) {
@@ -87,7 +98,7 @@ module.exports = function (app, db) {
                //US 8: If I try to request a book that doesn't exist I will get a 'no book exists' message.
               res.json({ message: "no book exists"})
             }
-          })
+          });
         }
       }
     })
@@ -110,9 +121,9 @@ module.exports = function (app, db) {
           },
           { new: true,
             returnOriginal: false,
-            },
+          },
           function(err, result) {
-            if (err) res.json({ message: "Database error."})
+            if (err) res.json({ message: "Database error."});
             else {
               if (result.value) {
                 res.json({
@@ -126,7 +137,7 @@ module.exports = function (app, db) {
               }
             }
           }
-        )
+        );
       }
     })
     
@@ -145,7 +156,7 @@ module.exports = function (app, db) {
           } else {
             res.json({ message: "no book exists" });
           }
-        })
+        });
       }
     });
 }
