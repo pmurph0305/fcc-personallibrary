@@ -15,6 +15,8 @@ chai.use(chaiHttp);
 
 suite('Functional Tests', function() {
 
+  let id;
+
   /*
   * ----[EXAMPLE TEST]----
   * Each test should completely test the response of the API end-point including response status code!
@@ -50,6 +52,7 @@ suite('Functional Tests', function() {
           assert.equal(res.status, 200);
           assert.equal(res.body.title, title, res.body.title + " does not equal " + title);
           assert.property(res.body, "_id", "_id was not returned with the response");
+          id = res.body._id;
           done();
         })
       });
@@ -83,24 +86,42 @@ suite('Functional Tests', function() {
         .end(function(err, res) {
           assert.equal(res.status, 200);
           assert.typeOf(res.body, "Array", "Response should be an Array");
-          assert.hasAllKeys(res.body[0], ['_id', 'title', 'commentcount'], "Every object should have title, _id, and commentcount");
+          assert.hasAllKeys(res.body[0], ["_id", "title", "commentcount"], "Every object should have title, _id, and commentcount");
           done();
         })
       });      
     });
 
 
-    // suite('GET /api/books/[id] => book object with [id]', function(){
+    suite('GET /api/books/[id] => book object with [id]', function(){
       
-    //   test('Test GET /api/books/[id] with id not in db',  function(done){
-    //     //done();
-    //   });
+      // US 8: If I try to request a book that doesn't exist I will get a 'no book exists' message.
+      test('Test GET /api/books/[id] with id not in db',  function(done){
+        let fakeId = "507f1f77bcf86cd799439011"
+        chai.request(server)
+        .get('/api/books/' + fakeId)
+        .end(function(err, res) {
+          assert.equal(res.status, 200);
+          assert.equal(res.body.message, "no book exists");
+          done();
+        })
+      });
       
-    //   test('Test GET /api/books/[id] with valid id in db',  function(done){
-    //     //done();
-    //   });
-      
-    // });
+      // I can get /api/books/{_id} to retrieve a single object 
+      // of a book containing title, _id, & an array of comments 
+      // (empty array if no comments present).
+      test('Test GET /api/books/[id] with valid id in db',  function(done){
+
+        chai.request(server)
+        .get("/api/books/"+id)
+        .end(function(err, res) {
+          assert.equal(res.status, 200);
+          assert.hasAllKeys(res.body, ["_id", "title", "comments"], "Body should have keys '_id', 'title' and 'comments'");
+          assert.isArray(res.body.comments, "Body.comments should be an array");
+          done();
+        })
+      });
+    });
 
 
     // suite('POST /api/books/[id] => add comment/expect book object with id', function(){

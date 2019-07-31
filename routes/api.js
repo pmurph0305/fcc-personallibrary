@@ -55,10 +55,38 @@ module.exports = function (app, db) {
       //if successful response will be 'complete delete successful'
     });
 
+
+  
   app.route('/api/books/:id')
+    //US 5: I can get /api/books/{_id} to retrieve a single object of a book containing
+    // title, _id, & an array of comments (empty array if no comments present).
     .get(function (req, res){
       var bookid = req.params.id;
-      //json res format: {"_id": bookid, "title": book_title, "comments": [comment,comment,...]}
+      if (!bookid) {
+        res.json({ message: "Must submit a bookid"})
+      } else {
+        // make sure book id is a valid ObjectId
+        if (!ObjectId.isValid(bookid)) {
+          res.json({ message: "Invalid book id." });
+        } else {
+          db.collection("books").findOne({ _id: ObjectId(bookid) }, function(err, result) {
+            if (err) res.json({ message: "Database error."})
+            // non empty result.
+            else if (result) {
+              if (!result.hasOwnProperty('comments')) {
+                result.comments = [];
+              }
+              //json res format: {"_id": bookid, "title": book_title, "comments": [comment,comment,...]}
+              res.json({ _id: result._id, title: result.title, comments: result.comments });
+            }
+            // book doesn't exist
+            else {
+               //US 8: If I try to request a book that doesn't exist I will get a 'no book exists' message.
+              res.json({ message: "no book exists"})
+            }
+          })
+        }
+      }
     })
     
     .post(function(req, res){
