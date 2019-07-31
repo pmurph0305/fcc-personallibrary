@@ -15,7 +15,6 @@ const MONGODB_CONNECTION_STRING = process.env.DB;
 //Example connection: MongoClient.connect(MONGODB_CONNECTION_STRING, function(err, db) {});
 
 module.exports = function (app) {
-
   app.route('/api/books')
     .get(function (req, res){
       //response will be array of book objects
@@ -30,8 +29,6 @@ module.exports = function (app) {
     .delete(function(req, res){
       //if successful response will be 'complete delete successful'
     });
-
-
 
   app.route('/api/books/:id')
     .get(function (req, res){
@@ -49,5 +46,4 @@ module.exports = function (app) {
       var bookid = req.params.id;
       //if successful response will be 'delete successful'
     });
-  
-};
+}

@@ -1,8 +1,9 @@
 'use strict';
-
+require('dotenv').config();
 var express     = require('express');
 var bodyParser  = require('body-parser');
 var cors        = require('cors');
+var MongoClient = require('mongodb').MongoClient;
 
 var apiRoutes         = require('./routes/api.js');
 var fccTestingRoutes  = require('./routes/fcctesting.js');
@@ -16,6 +17,14 @@ app.use(cors({origin: '*'})); //USED FOR FCC TESTING PURPOSES ONLY!
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+MongoClient.connect(process.env.DB, { useNewUrlParser: true }, (err, client) => {
+  if (err) console.log("DB Error: "+ err);
+  else {
+    console.log("Database connected");
+    let db = client.db("personallibrary");
+  }
+})
 
 //Index page (static HTML)
 app.route('/')
@@ -38,7 +47,7 @@ app.use(function(req, res, next) {
 
 //Start our server and tests!
 app.listen(process.env.PORT || 3000, function () {
-  console.log("Listening on port " + process.env.PORT);
+  console.log("Listening on port " + (process.env.PORT || 3000));
   if(process.env.NODE_ENV==='test') {
     console.log('Running Tests...');
     setTimeout(function () {
