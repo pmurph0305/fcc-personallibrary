@@ -73,7 +73,7 @@ module.exports = function (app, db) {
             if (err) res.json({ message: "Database error."})
             // non empty result.
             else if (result) {
-              if (!result.hasOwnProperty('comments')) {
+              if (!result.hasOwnProperty("comments")) {
                 result.comments = [];
               }
               //json res format: {"_id": bookid, "title": book_title, "comments": [comment,comment,...]}
@@ -89,10 +89,16 @@ module.exports = function (app, db) {
       }
     })
     
+
+    //US 6: I can post a comment to /api/books/{_id} to add a 
+    //comment to a book and returned will be the books object
+    // similar to get /api/books/{_id}.
     .post(function(req, res){
       var bookid = req.params.id;
       var comment = req.body.comment;
       //json res format same as .get
+
+      // //US 8: If I try to request a book that doesn't exist I will get a 'no book exists' message.
     })
     
     .delete(function(req, res){

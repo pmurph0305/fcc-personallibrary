@@ -117,20 +117,32 @@ suite('Functional Tests', function() {
         .end(function(err, res) {
           assert.equal(res.status, 200);
           assert.hasAllKeys(res.body, ["_id", "title", "comments"], "Body should have keys '_id', 'title' and 'comments'");
-          assert.isArray(res.body.comments, "Body.comments should be an array");
+          assert.isArray(res.body.comments, "Body.comments should be an array.");
           done();
         })
       });
     });
 
 
-    // suite('POST /api/books/[id] => add comment/expect book object with id', function(){
+    suite('POST /api/books/[id] => add comment/expect book object with id', function(){
       
-    //   test('Test POST /api/books/[id] with comment', function(done){
-    //     //done();
-    //   });
+      test('Test POST /api/books/[id] with comment', function(done){
+        chai.request(server)
+        .post("/api/books/"+id)
+        .send({
+          comment: "CommentTest"
+        })
+        .end(function(err, res) {
+          assert.equal(res.status, 200);
+          assert.hasAllKeys(res.body, ["_id", "title", "comments"], "Body should have keys '_id', 'title' and 'comments'");
+          assert.isArray(res.body.comments, "Body.comments should be an array.");
+          assert.isAtLeast(res.body.comments.length, 1, "Comments should a length of at least 1.");
+          done();
+        })
+        //done();
+      });
       
-    // });
+    });
 
   });
 
