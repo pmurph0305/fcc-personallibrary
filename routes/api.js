@@ -19,12 +19,11 @@ module.exports = function (app, db) {
   // of all books containing title, _id, & commentcount.
   app.route('/api/books')
     .get(function (req, res){
-      db.collection('books').find({}).toArray().then(result => {
+      db.collection('books').find({}, { projection: { _id: 1, title:1, commentcount:1 }}).toArray().then(result => {
         //response will be array of book objects
         //json res format: [{"_id": bookid, "title": book_title, "commentcount": num_of_comments },...]
         res.json(result);
       });
-     
     })
     
     //US 3: I can post a title to /api/books to add a book and returned will be the object with the title and a unique _id.
@@ -77,7 +76,11 @@ module.exports = function (app, db) {
                 result.comments = [];
               }
               //json res format: {"_id": bookid, "title": book_title, "comments": [comment,comment,...]}
-              res.json({ _id: result._id, title: result.title, comments: result.comments });
+              res.json({ 
+                _id: result._id, 
+                title: result.title, 
+                comments: result.comments 
+              });
             }
             // book doesn't exist
             else {
@@ -96,8 +99,30 @@ module.exports = function (app, db) {
     .post(function(req, res){
       var bookid = req.params.id;
       var comment = req.body.comment;
-      //json res format same as .get
-
+      // make sure we have a valid book id.
+      if(!ObjectId.isValid(bookid)) {
+        res.json({ message: "Invalid book id." });
+      } else {
+        db.collection('books').findOneAndUpdate(
+          { _id: ObjectId(bookid) },
+          { $push: { comments: comment },
+            $inc: { commentcount: 1 }
+          },
+          { new: true,
+            returnOriginal: false,
+            },
+          function(err, result) {
+            if (err) res.json({ message: "Database error."})
+            else {
+              res.json({
+                _id: result.value._id,
+                title: result.value.title,
+                comments: result.value.comments,
+              });
+            }
+          }
+        )
+      }
       // //US 8: If I try to request a book that doesn't exist I will get a 'no book exists' message.
     })
     

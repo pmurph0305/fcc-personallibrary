@@ -111,7 +111,6 @@ suite('Functional Tests', function() {
       // of a book containing title, _id, & an array of comments 
       // (empty array if no comments present).
       test('Test GET /api/books/[id] with valid id in db',  function(done){
-
         chai.request(server)
         .get("/api/books/"+id)
         .end(function(err, res) {
@@ -123,20 +122,21 @@ suite('Functional Tests', function() {
       });
     });
 
-
+    // I can post a comment to /api/books/{_id} to add a comment to a book and returned will be the books object similar to get /api/books/{_id}.
     suite('POST /api/books/[id] => add comment/expect book object with id', function(){
-      
       test('Test POST /api/books/[id] with comment', function(done){
+        let testComment = "CommentTest"
         chai.request(server)
         .post("/api/books/"+id)
         .send({
-          comment: "CommentTest"
+          comment: testComment
         })
         .end(function(err, res) {
           assert.equal(res.status, 200);
           assert.hasAllKeys(res.body, ["_id", "title", "comments"], "Body should have keys '_id', 'title' and 'comments'");
           assert.isArray(res.body.comments, "Body.comments should be an array.");
           assert.isAtLeast(res.body.comments.length, 1, "Comments should a length of at least 1.");
+          assert.include(res.body.comments, testComment, "Comments array should incldue " + testComment);
           done();
         })
         //done();
