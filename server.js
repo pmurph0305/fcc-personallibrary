@@ -4,6 +4,7 @@ var express     = require('express');
 var bodyParser  = require('body-parser');
 var cors        = require('cors');
 var MongoClient = require('mongodb').MongoClient;
+var helmet = require('helmet');
 
 var apiRoutes         = require('./routes/api.js');
 var fccTestingRoutes  = require('./routes/fcctesting.js');
@@ -17,6 +18,8 @@ app.use(cors({origin: '*'})); //USED FOR FCC TESTING PURPOSES ONLY!
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+//US 1: Nothing from my website will be cached in my client as a security measure.
+app.use(helmet.noCache());
 
 MongoClient.connect(process.env.DB, { useNewUrlParser: true }, (err, client) => {
   if (err) console.log("DB Error: "+ err);
