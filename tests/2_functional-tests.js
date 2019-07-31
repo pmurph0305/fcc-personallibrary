@@ -54,7 +54,7 @@ suite('Functional Tests', function() {
           assert.property(res.body, "_id", "_id was not returned with the response");
           id = res.body._id;
           done();
-        })
+        });
       });
       
       // User stories does not say how to handle no title given
@@ -72,9 +72,8 @@ suite('Functional Tests', function() {
           assert.notProperty(res.body, "_id", "With no title given, response should not have an '_id' property");
           assert.notProperty(res.body, "title", "With no title given, response should not have a 'title' property.");
           done();
-        })
+        });
       });
-
     });
 
 
@@ -88,7 +87,7 @@ suite('Functional Tests', function() {
           assert.typeOf(res.body, "Array", "Response should be an Array");
           assert.hasAllKeys(res.body[0], ["_id", "title", "commentcount"], "Every object should have title, _id, and commentcount");
           done();
-        })
+        });
       });      
     });
 
@@ -104,7 +103,7 @@ suite('Functional Tests', function() {
           assert.equal(res.status, 200);
           assert.equal(res.body.message, "no book exists");
           done();
-        })
+        });
       });
       
       // US: 5 I can get /api/books/{_id} to retrieve a single object 
@@ -118,7 +117,7 @@ suite('Functional Tests', function() {
           assert.hasAllKeys(res.body, ["_id", "title", "comments"], "Body should have keys '_id', 'title' and 'comments'");
           assert.isArray(res.body.comments, "Body.comments should be an array.");
           done();
-        })
+        });
       });
     });
 
@@ -138,7 +137,7 @@ suite('Functional Tests', function() {
           assert.isAtLeast(res.body.comments.length, 1, "Comments should a length of at least 1.");
           assert.include(res.body.comments, testComment, "Comments array should incldue " + testComment);
           done();
-        })
+        });
       });
     });
 
@@ -151,21 +150,35 @@ suite('Functional Tests', function() {
           assert.equal(res.status, 200);
           assert.equal(res.body.message, "delete successful");
           done();
-        })
-      })
+        });
+      });
 
       // US 8 If I try to request a book that doesn't exist I will get a 'no book exists' message.
       test("Test DELETE /api/books/[id] with id not in database", function(done) {
-        let fakeId = "507f1f77bcf86cd799439011"
+        let fakeId = "507f1f77bcf86cd799439011";
         chai.request(server)
         .delete("/api/books/"+fakeId)
         .end(function(err, res) {
           assert.equal(res.status, 200);
           assert.equal(res.body.message, "no book exists");
           done();
-        })
-      })
+        });
+      });
     });
 
+    // If I try to request a book that doesn't exist I will get a 'no book exists' message.
+    suite("Extra tests for routes to test US 8", function() {
+      test("test POST /api/books/[id] with comment to id that does not exist", function(done) {
+        let fakeId = "507f1f77bcf86cd799439011";
+        chai.request(server)
+        .post("/api/books/"+fakeId)
+        .send({ comment: "fakeComment" })
+        .end(function(err, res) {
+          assert.equal(res.status, 200);
+          assert.equal(res.body.message, "no book exists");
+          done();
+        });
+      });
+    });
   });
 });
