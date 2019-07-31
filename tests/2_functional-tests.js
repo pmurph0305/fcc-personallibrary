@@ -143,7 +143,6 @@ suite('Functional Tests', function() {
     });
 
     // US 7: I can delete /api/books/{_id} to delete a book from the collection. Returned will be 'delete successful' if successful.
-    // self expanded to response of delete unsuccessful if delete is not successful.
     suite("DELETE /api/books/{_id} => delete a book with 'delete successful' if successful", function() {
       test("Test DELETE /api/books/[id] with valid id", function(done) {
         chai.request(server)
@@ -155,17 +154,18 @@ suite('Functional Tests', function() {
         })
       })
 
+      // US 8 If I try to request a book that doesn't exist I will get a 'no book exists' message.
       test("Test DELETE /api/books/[id] with id not in database", function(done) {
         let fakeId = "507f1f77bcf86cd799439011"
         chai.request(server)
         .delete("/api/books/"+fakeId)
         .end(function(err, res) {
-          //console.log(res.body);
           assert.equal(res.status, 200);
-          assert.equal(res.body.message, "delete unsuccessful");
+          assert.equal(res.body.message, "no book exists");
           done();
         })
       })
     });
+
   });
 });

@@ -143,7 +143,7 @@ module.exports = function (app, db) {
           else if (result.deletedCount === 1) {
             res.json({ message: "delete successful" });
           } else {
-            res.json({ message: "delete unsuccessful" });
+            res.json({ message: "no book exists" });
           }
         })
       }
